@@ -13,7 +13,7 @@ module Widow
 
     def get(path, options = {}, &block)
       @actions_stack.push \
-        path: full_path(path),
+        url: full_path(path),
         callback: block,
         method: :get,
         options: options
@@ -21,24 +21,33 @@ module Widow
 
     def post(path, options = {}, &block)
        @actions_stack.push \
-        path: full_path(path),
+        url: full_path(path),
         callback: block,
         method: :post,
         options: options
     end
 
     def full_path(path)
-      path.match(/^https?:\/\//) ? path : root_url + path
+      path =~ /^https?:\/\// ? path : root_url + path
     end
 
-  end
-
-  class Page
-    attr_reader :raw, :parsed
-
-    def initialize(raw)
-      @raw = raw
-      @parsed = Nokogiri::HTML(raw.dup)
+    def run
+      while not @actions_stack.empty?
+        action = @actions_stack.shift
+        distpach action
+      end
     end
+
+    private
+      def distpach(action)
+        method = action.delete(:method)
+
+        case method
+        when :get
+          Page.new(@client.get_content(action[:url]))
+        when :post
+        end
+      end
+
   end
 end

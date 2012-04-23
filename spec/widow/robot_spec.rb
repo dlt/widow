@@ -46,5 +46,18 @@ describe Widow::Robot do
     robot.full_path("http://foo.bar").should == "http://foo.bar"
   end
 
+  describe "when running" do
+
+    it "should yield an instance of Widow::Page" do
+      robot.get "/search?q=concurrency" do |page|
+        page.should be_instance Widow::Page
+      end
+
+      VCR.use_cassette("default_google_search", serialize_with: :json) do
+        robot.run
+      end
+    end
+  end
+
 end
 
