@@ -6,4 +6,5 @@ gem 'httpclient'
 
 group :development do
   gem 'pry'
+  gem 'vcr'
 end
