@@ -32,7 +32,7 @@ module Widow
     end
 
     def run
-      while not @actions_stack.empty?
+      until @actions_stack.empty?
         action = @actions_stack.shift
         distpach action
       end
@@ -44,7 +44,7 @@ module Widow
 
         case method
         when :get
-          Page.new(@client.get_content(action[:url]))
+          Page.new @client.get_content(action[:url])
         when :post
         end
       end

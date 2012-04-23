@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Widow::Robot do
+describe Robot do
   let(:robot_class) do
     Class.new do
-      include Widow::Robot
+      include Robot
     end
   end
 
@@ -50,7 +50,7 @@ describe Widow::Robot do
 
     it "should yield an instance of Widow::Page" do
       robot.get "/search?q=concurrency" do |page|
-        page.should be_instance Widow::Page
+        page.should be_instance Page
       end
 
       VCR.use_cassette("default_google_search", serialize_with: :json) do
