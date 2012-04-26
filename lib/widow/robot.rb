@@ -1,4 +1,5 @@
 require 'celluloid'
+require 'logger'
 
 module Widow
   # The main module. Every new robot should include the Robot module.
@@ -13,9 +14,7 @@ module Widow
     # in the base object
     #
     def self.included(base)
-      base.instance_eval do
-        include Celluloid
-      end
+      base.send :include, Celluloid
     end
 
     attr_reader :root_url
