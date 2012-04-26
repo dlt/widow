@@ -1,12 +1,36 @@
+require 'celluloid'
+
 module Widow
+  # The main module. Every new robot should include the Robot module.
+  #
+  # It will handle most of the basic crawling activity like logging, 
+  # scheduling the requests and parsing the robots.txt file. 
+  #
+  # More documentation about this as development keeps going.
   module Robot
+
+    # Automaticaly includes the Celluloid module
+    # in the base object
+    #
+    def self.included(base)
+      base.instance_eval do
+        include Celluloid
+      end
+    end
 
     attr_reader :root_url
 
     attr_reader :actions_stack
 
-    def initialize(options = {})
-      @root_url = options.delete(:root_url)
+    attr_reader :timer
+
+    def initialize(config = {})
+      unless config[:interval_between_requests]
+        raise ArgumentError, "Set required option :interval_between_requests"
+      end
+
+      @config = config
+      @root_url = config.delete(:root_url)
       @client   = HTTPClient.new
       @actions_stack = []
     end
@@ -32,14 +56,16 @@ module Widow
     end
 
     def run
-      until @actions_stack.empty?
-        action = @actions_stack.shift
-        distpach action
+      @timer = after(@config[:interval_between_requests]) do
+        unless @actions_stack.empty?
+          action = @actions_stack.shift
+          dispatch action
+        end
       end
     end
 
     private
-      def distpach(action)
+      def dispatch(action)
         method = action.delete(:method)
 
         case method

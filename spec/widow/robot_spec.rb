@@ -8,7 +8,10 @@ describe Robot do
   end
 
   let(:robot) do
-    robot_class.new(root_url: "http://google.com")
+    robot_class.new({
+      root_url: "http://google.com",
+      interval_between_requests: 0.01
+    })
   end
 
   it "should set the root_url upon initialization" do
@@ -47,6 +50,17 @@ describe Robot do
   end
 
   describe "when running" do
+    it "should raise config exception if :interval_between_requests option isn't set" do
+      lambda {
+        robot = robot_class.new({})
+      }.should raise_error(ArgumentError)
+
+      lambda {
+        robot = robot_class.new interval_between_requests: 0.1
+      }.should_not raise_error
+
+
+    end
 
     it "should yield an instance of Widow::Page" do
       robot.get "/search?q=concurrency" do |page|
