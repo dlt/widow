@@ -18,30 +18,30 @@ describe Robot do
     robot.root_url.should == "http://google.com"
   end
 
-  it "should add an GET action to the actions stack" do
-    robot.actions_stack.size.should be_zero
+  it "should add an GET action to the request stack" do
+    robot.request_stack.size.should be_zero
 
     robot.get "/" do |page|
       1
     end
 
-    robot.actions_stack.size.should == 1
-    robot.actions_stack.first[:method].should == :get
+    robot.request_stack.size.should == 1
+    robot.request_stack.first[:method].should == :get
 
     robot.get "/foo" do |page|
       2
     end
 
-    robot.actions_stack.size.should == 2
-    robot.actions_stack.last[:method].should == :get
+    robot.request_stack.size.should == 2
+    robot.request_stack.last[:method].should == :get
   end
 
   it "should add a POST action to the action stack" do
-    robot.actions_stack.size.should be_zero
+    robot.request_stack.size.should be_zero
     robot.post "/post" do
     end
-    robot.actions_stack.size.should == 1
-    robot.actions_stack.first[:method].should == :post
+    robot.request_stack.size.should == 1
+    robot.request_stack.first[:method].should == :post
   end
 
   it "should prepend return the url full path" do
@@ -58,8 +58,6 @@ describe Robot do
       lambda {
         robot = robot_class.new interval_between_requests: 0.1
       }.should_not raise_error
-
-
     end
 
     it "should yield an instance of Widow::Page" do

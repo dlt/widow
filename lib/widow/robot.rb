@@ -19,7 +19,7 @@ module Widow
 
     attr_reader :root_url
 
-    attr_reader :actions_stack
+    attr_reader :request_stack
 
     attr_reader :timer
 
@@ -31,48 +31,44 @@ module Widow
       @config = config
       @root_url = config.delete(:root_url)
       @http_client   = HTTPClient.new
-      @actions_stack = []
+      @request_stack = []
     end
 
-    def get(path, options = {}, &block)
-      @actions_stack.push \
+    def get(path, parameters = {}, &block)
+      @request_stack.push \
         url: full_path(path),
         callback: block,
         method: :get,
-        options: options
+        parameters: parameters
     end
 
-    def post(path, options = {}, &block)
-       @actions_stack.push \
+    def post(path, parameters = {}, &block)
+       @request_stack.push \
         url: full_path(path),
         callback: block,
         method: :post,
-        options: options
-    end
-
-    def full_path(path)
-      path =~ /^https?:\/\// ? path : root_url + path
+        parameters: parameters
     end
 
     def run
       @timer = after(@config[:interval_between_requests]) do
-        unless @actions_stack.empty?
-          action = @actions_stack.shift
+        unless @request_stack.empty?
+          action = @request_stack.shift
           dispatch action
         end
       end
     end
 
-    private
-      def dispatch(action)
-        method = action.delete(:method)
-
-        case method
-        when :get
-          Page.new @http_client.get_content(action[:url])
-        when :post
-        end
+    def dispatch(action)
+      case action[:method]
+      when :get
+        Page.new @http_client.get_content(action[:url])
+      when :post
       end
+    end
 
+    def full_path(path)
+      path =~ /^https?:\/\// ? path : root_url + path
+    end
   end
 end
