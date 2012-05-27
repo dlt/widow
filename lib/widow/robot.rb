@@ -30,7 +30,7 @@ module Widow
 
       @config = config
       @root_url = config.delete(:root_url)
-      @client   = HTTPClient.new
+      @http_client   = HTTPClient.new
       @actions_stack = []
     end
 
@@ -69,7 +69,7 @@ module Widow
 
         case method
         when :get
-          Page.new @client.get_content(action[:url])
+          Page.new @http_client.get_content(action[:url])
         when :post
         end
       end
